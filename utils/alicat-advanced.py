@@ -16,8 +16,8 @@ class Controller:
         except serial.SerialException as e:
             raise RuntimeError(f'Failed to open serial port: {e}')
         
-        self._send_command('TC 1 -1 0 -1 7 0') # Sets up Totalizer 1
-        self._send_command('TC 2 1') # Polling relies on knowing only one totalizer is active, dissables totalizer 2
+        print(self._send_command('TC 1 5 0 -1 7 0')) # Sets up Totalizer 1
+        print(self._send_command('TC 2 1')) # Polling relies on knowing only one totalizer is active, dissables totalizer 2
 
         self._send_command('GS 6') # Set default gas to H2 (number 6)
         
@@ -71,16 +71,10 @@ class Controller:
             # ───────────────────────────────────────────────────────────────────────────
             "pressure_units": {
                 "Pa":      2,   # Pascal
-                "kPa":     3,   # Kilopascal
-                "MPa":     4,   # Megapascal
-                "mbar":    5,   # Millibar
-                "bar":     6,   # Bar
-                "g/cm²":   7,   # Gram-force per square centimeter
-                "kg/cm²":  8,   # Kilogram-force per square centimeter
+                "MPa":     5,   # Megapascal
+                "mbar":    6,   # Millibar
+                "bar":     7,   # Bar
                 "PSI":    10,   # Pound-force per square inch
-                "PSF":    11,   # Pound-force per square foot
-                "mTorr":  12,   # Millitorr
-                "torr":   13,   # Torr
             },
             # etc based on labels
         }
@@ -99,6 +93,7 @@ class Controller:
     def poll(self):
         '''Poll flow, pressure, and temperature.'''
         data=self._send_command('')
+        print(data)
         data_dict={
             'U':data[0],
             'P':float(data[1]), # Downstream pressure (barA)
@@ -320,6 +315,7 @@ if __name__=='__main__':
     FC.totalizer_reset(1)
     print(FC._send_command('LCG 0'))
     t_start=time.time()
+    FC.units = ('Pressure', 'bar')  # Set pressure units to bar
 
     while True:
         try:
